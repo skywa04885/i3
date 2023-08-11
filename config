@@ -55,7 +55,14 @@ bindsym $mod+Return exec kitty
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec "dmenu_run -nf '#F8F8F2' -nb '#282A36' -sb '#6272A4' -sf '#F8F8F2' -p 'dmenu%' -fn 'BigBlueTerm437 Nerd Font'"
+bindsym $mod+d exec rofi -show drun
+
+# Screenshots
+bindsym Print exec --no-startup-id maim "/home/$USER/Pictures/Screenshots/$(date).png"
+bindsym Shift+Print exec --no-startup-id maim --select "/home/$USER/Pictures/Screenshots/$(date).png"
+
+bindsym Ctrl+Print exec --no-startup-id maim | xclip -selection clipboard -t image/png
+bindsym Ctrl+Shift+Print exec --no-startup-id maim --select | xclip -selection clipboard -t image/png
 
 # change focus
 bindsym $mod+h focus left
@@ -170,11 +177,12 @@ bindsym $mod+m mode $misc_mode
 
 # Display mode
 
-set $display_mode "HDMI-A-0 l: Left-Of eDP, r: Right-Of eDP"
+set $display_mode "HDMI-A-0 l: Left-Of eDP, r: Right-Of eDP, a: Auto"
 
 mode $display_mode {
-  bindsym l exec "xrandr --output HDMI-A-0 --left-of eDP --auto"
-  bindsym r exec "xrandr --output HDMI-A-0 --right-of eDP --auto"
+  bindsym l exec "xrandr --output HDMI-A-0 --left-of eDP --auto && ~/.config/i3/scripts/polybar.sh"
+  bindsym r exec "xrandr --output HDMI-A-0 --right-of eDP --auto && ~/.config/i3/scripts/polybar.sh"
+  bindsym a exec "xrandr --auto && ~/.config/i3/scripts/polybar.sh"
 
   bindsym Return mode "default"
   bindsym Escape mode "default"
@@ -183,23 +191,7 @@ mode $display_mode {
 
 bindsym $mod+Shift+d mode $display_mode
 
-# bar {
-#   status_command i3status
-
-#   colors {
-#     background #282A36
-#     statusline #F8F8F2
-#     separator  #44475A
-
-#     focused_workspace  #44475A #44475A #F8F8F2
-#     active_workspace   #282A36 #44475A #F8F8F2
-#     inactive_workspace #282A36 #282A36 #BFBFBF
-#     urgent_workspace   #FF5555 #FF5555 #F8F8F2
-#     binding_mode       #FF5555 #FF5555 #F8F8F2
-#   }
-# }
-
-exec dunst
-exec picom --daemon 
-exec nitrogen --no-recurse --restore /usr/share/backgrounds/valley.jpg
-exec --no-startup-id polybar
+exec --no-startup-id dunst
+exec --no-startup-id picom --daemon 
+exec --no-startup-id nitrogen --no-recurse --restore
+exec --no-startup-id ~/.config/i3/scripts/polybar.sh
