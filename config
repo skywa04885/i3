@@ -60,7 +60,6 @@ bindsym $mod+d exec rofi -show drun
 # Screenshots
 bindsym Print exec --no-startup-id maim "/home/$USER/Pictures/Screenshots/$(date).png"
 bindsym Shift+Print exec --no-startup-id maim --select "/home/$USER/Pictures/Screenshots/$(date).png"
-
 bindsym Ctrl+Print exec --no-startup-id maim | xclip -selection clipboard -t image/png
 bindsym Ctrl+Shift+Print exec --no-startup-id maim --select | xclip -selection clipboard -t image/png
 
@@ -132,12 +131,8 @@ bindsym $mod+Shift+8 move container to workspace number $ws8
 bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 
-# reload the configuration file
 bindsym $mod+Shift+c reload
-# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
-# exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
 # Resize mode
 
@@ -161,6 +156,39 @@ mode $resize_mode {
 
 bindsym $mod+r mode $resize_mode
 
+# Ubuntu mode
+
+set $ubuntu_mode "[Ubuntu] p: power, a: apps"
+set $ubuntu_power_mode "[Ubuntu Power] s: start, S: stop, r: reboot"
+set $ubuntu_app_mode "[Ubuntu Apps] s: shell, v: vscode"
+
+mode $ubuntu_power_mode {
+  bindsym s exec --no-startup-id "/bin/kitty sudo machinectl start ubuntu-ros2"
+  bindsym Shift+s exec --no-startup-id "/bin/kitty sudo machinectl stop ubuntu-ros2"
+  bindsym r exec --no-startup-id "/bin/kitty sudo machinectl reboot ubuntu-ros2"
+
+  bindsym Return mode $ubuntu_mode
+  bindsym Escape mode $ubuntu_mode
+}
+
+mode $ubuntu_app_mode {
+  bindsym s exec --no-startup-id "/bin/kitty sudo machinectl shell --setenv DISPLAY=:0 --setenv TERM=xterm luke@ubuntu-ros2 /bin/fish"
+  bindsym v exec --no-startup-id "sudo machinectl shell --setenv DISPLAY=:0 luke@ubuntu-ros2 /bin/code"
+  
+  bindsym Return mode $ubuntu_mode
+  bindsym Escape mode $ubuntu_mode
+}
+
+mode $ubuntu_mode {
+  bindsym p mode $ubuntu_power_mode
+  bindsym a mode $ubuntu_app_mode
+
+  bindsym Return mode "default"
+  bindsym Escape mode "default"
+}
+
+bindsym $mod+u mode $ubuntu_mode
+
 # Misc mode
 
 set $misc_mode "MISC l: Lock screen"
@@ -180,9 +208,9 @@ bindsym $mod+m mode $misc_mode
 set $display_mode "HDMI-A-0 l: Left-Of eDP, r: Right-Of eDP, a: Auto"
 
 mode $display_mode {
-  bindsym l exec "xrandr --output HDMI-A-0 --left-of eDP --auto && ~/.config/i3/scripts/polybar.sh"
-  bindsym r exec "xrandr --output HDMI-A-0 --right-of eDP --auto && ~/.config/i3/scripts/polybar.sh"
-  bindsym a exec "xrandr --auto && ~/.config/i3/scripts/polybar.sh"
+  bindsym l exec --no-startup-id "xrandr --output HDMI-A-0 --left-of eDP --auto && ~/.config/i3/scripts/polybar.sh"
+  bindsym r exec --no-startup-id "xrandr --output HDMI-A-0 --right-of eDP --auto && ~/.config/i3/scripts/polybar.sh"
+  bindsym a exec --no-startup-id "xrandr --auto && ~/.config/i3/scripts/polybar.sh"
 
   bindsym Return mode "default"
   bindsym Escape mode "default"
@@ -192,6 +220,6 @@ mode $display_mode {
 bindsym $mod+Shift+d mode $display_mode
 
 exec --no-startup-id dunst
-exec --no-startup-id picom --daemon 
+exec --no-startup-id xcompmgr
 exec --no-startup-id nitrogen --no-recurse --restore
 exec --no-startup-id ~/.config/i3/scripts/polybar.sh
